@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lisa or Lena? Coquette Edition</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            background-color: #000000;
+        }
+        
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('lisa lena background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+
+        .front-page {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-text-container {
+            padding: 20px;
+            width: 90%;
+            max-width: 650px;
+            position: relative;
+            z-index: 2;
+            box-sizing: border-box;
+        }
+
+        .coquette-title {
+            font-size: 4rem; 
+            font-weight: 900;
+            color: #FF69b4; 
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .subtitle-text {
+            font-size: 1.6rem;
+            color: #FFB6C1; 
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        #start-btn, .restart-btn {
+            background-color: #FF69b4; 
+            color: white;
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            padding: 16px 50px;
+            border: 3px solid #fff;
+            border-radius: 8px; 
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        #start-btn:hover, .restart-btn:hover {
+            background-color: #fff;
+            color: #FF69b4;
+            border-color: #FF69b4;
+        }
+
+        .quiz-box {
+            position: relative;
+            z-index: 5;
+            color: #FF69b4;
+            padding: 20px;
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .game-status {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            color: #FF69b4;
+            font-weight: bold;
+            font-size: 1.5rem; 
+            letter-spacing: 1px;
+        }
+
+        .choices-split-grid {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .choice-item {
+            flex: 1;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 4px solid transparent;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transition: all 0.25s ease;
+        }
+
+        .choice-item img {
+            width: 100%;
+            height: 480px;
+            object-fit: contain;
+            display: block;
+            background-color: #fff;
+        }
+
+        .choice-item:hover {
+            transform: translateY(-5px);
+            border-color: #FF69b4;
+            box-shadow: 0 15px 30px rgba(255, 105, 180, 0.5);
+        }
+
+        .label-bar {
+            padding: 16px;
+            font-size: 1.3rem;
+            background: #fff;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-layer"></div>
+    
+
+    <div id="start-screen" class="front-page">
+        <div class="hero-text-container">
+            <h1 class="coquette-title">LISA OR LENA?</h1>
+            <p class="subtitle-text">Whose style do you like the most?</p>
+            <button id="start-btn" onclick="startGame()">ENTER QUIZ</button>
+        </div>
+    </div>
+
+    
+    <div id="quiz-container" class="quiz-box hidden">
+        <div class="game-status">
+            <span id="progress">Round 1 of 5</span>
+            <span id="question-text">Loading...</span>
+        </div>
+        <div class="choices-split-grid">
+            <div class="choice-item" onclick="selectVibe('lisa')">
+                <img id="lisa-pic" src="" alt="Lisa Option">
+                <div class="label-bar" style="color: #FF69b4;">LISA VIBE</div>
+            </div>
+            <div class="choice-item" onclick="selectVibe('lena')">
+                <img id="lena-pic" src="" alt="Lena Option">
+                <div class="label-bar" style="color: #FF69b4;">LENA VIBE</div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="end-screen" class="quiz-box hidden">
+        <h1 class="coquette-title">YOUR RESULT</h1>
+        <h2 id="final-verdict" style="font-size: 3rem; margin: 20px 0; color: #FF69b4;"></h2>
+        <p id="final-desc" style="font-size: 1.5rem; padding: 0 40px; line-height: 1.7; color: #FFF; font-weight: bold;"></p>
+        <button class="restart-btn" onclick="restartGame()" style="margin-top: 30px;">PLAY AGAIN</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                category: "Pick your outfit",
+                lisaImg: "lisa dress.jpg", 
+                lenaImg: "lena dress.jpg"
+            },
+            {
+                category: "Pick your room 🪞",
+                lisaImg: "lisa bedroom.jpg", 
+                lenaImg: "lena bedroom.jpg"
+            },
+            {
+                category: "Pick your nails 🎀",
+                lisaImg: "lisa nails.jpg", 
+                lenaImg: "lena nails.jpg"
+            },
+            {
+                category: "Pick your fav dessert ☕🍰",
+                lisaImg: "lisa foood.jpg", 
+                lenaImg: "lena food.jpg"
+            },
+            {
+                category: "Pick your Footwear",
+                lisaImg: "lisa shoes.jpg", 
+                lenaImg: "lena shoes.jpg"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let scores = { lisa: 0, lena: 0 };
+
+        const startScreen = document.getElementById("start-screen");
+        const quizContainer = document.getElementById("quiz-container");
+        const endScreen = document.getElementById("end-screen");
+        const progressElement = document.getElementById("progress");
+        const questionText = document.getElementById("question-text");
+        const lisaPic = document.getElementById("lisa-pic");
+        const lenaPic = document.getElementById("lena-pic");
+
+        function startGame() {
+            startScreen.classList.add("hidden");
+            endScreen.classList.add("hidden");
+            quizContainer.classList.remove("hidden");
+            currentQuestionIndex = 0;
+            scores = { lisa: 0, lena: 0 };
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= quizData.length) {
+                showEndScreen();
+                return;
+            }
+
+            const currentData = quizData[currentQuestionIndex];
+            progressElement.textContent = `Round ${currentQuestionIndex + 1} of ${quizData.length}`;
+            questionText.textContent = currentData.category;
+            
+            lisaPic.src = currentData.lisaImg;
+            lenaPic.src = currentData.lenaImg;
+        }
+
+        function selectVibe(vibe) {
+            scores[vibe]++;
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function showEndScreen() {
+            quizContainer.classList.add("hidden");
+            endScreen.classList.remove("hidden");
+            
+            const finalVerdict = document.getElementById("final-verdict");
+            const finalDesc = document.getElementById("final-desc");
+            
+            if (scores.lisa > scores.lena) {
+                finalVerdict.textContent = "You are more Lisa!";
+                finalDesc.textContent = "your style is dope girly, its a mix of edgy and cute, fashonista vibes!✨";
+            } else {
+                finalVerdict.textContent = "You are more Lena!";
+                finalDesc.textContent = "I love your fashion choices girly. your closet must be teaaa!✨";
+            }
+        }
+
+        function restartGame() {
+            startGame();
+        }
+    </script>
+</body>
+</html>
